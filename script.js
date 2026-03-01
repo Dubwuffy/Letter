@@ -1,3 +1,6 @@
+document.addEventListener("DOMContentLoaded", () => {
+  // SAV TVOJ JS IDE OVDJE UNUTRA
+});
 /* ====== DOM HELPERS ====== */
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -241,3 +244,4 @@ function spawnNote() {
   setTimeout(() => el.remove(), 2500);
   setTimeout(spawnNote, 750 + Math.random() * 450);
 }
+
