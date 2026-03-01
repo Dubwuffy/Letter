@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="style.css">
+  <script src="scripts.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A Letter for Dennis</title>
+
+  <!-- Optional fonts (CSS will use them later) -->
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Background particles canvas (JS will draw here later) -->
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <!-- Full-screen seal overlay -->
+  <section class="seal-screen" id="sealScreen" aria-label="Letter opener">
+    <div class="wax-seal" id="waxSeal" role="button" tabindex="0" aria-label="Crack the wax seal">
+      <!-- Simple sword icon (SVG) -->
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <rect x="48" y="10" width="4" height="60" rx="2"></rect>
+        <polygon points="50,70 42,88 50,82 58,88"></polygon>
+        <rect x="30" y="38" width="40" height="4" rx="2"></rect>
+        <rect x="46" y="8" width="8" height="8" rx="1"></rect>
+      </svg>
+    </div>
+
+    <p class="seal-hint" id="sealHint">✦ CLICK THE SEAL ✦</p>
+    <p class="seal-label" id="sealLabel">A letter awaits you</p>
+
+    <!-- Menu appears after seal is cracked -->
+    <div class="seal-menu" id="sealMenu" aria-label="Open options">
+      <button class="seal-btn" id="openBtn" type="button">📜 Open Letter</button>
+      <button class="seal-btn red-btn" id="openMusicBtn" type="button">⚔ Play &amp; Open</button>
+    </div>
+  </section>
+
+  <!-- Main scene -->
+  <main class="scene">
+    <!-- The letter -->
+    <article class="letter" id="letter" aria-label="Letter content">
+      <!-- Decorative corners (CSS later) -->
+      <span class="corner tl" aria-hidden="true">❧</span>
+      <span class="corner tr" aria-hidden="true">❧</span>
+      <span class="corner bl" aria-hidden="true">❧</span>
+      <span class="corner br" aria-hidden="true">❧</span>
+
+      <header class="letter-header">
+        <span class="letter-emblem" aria-hidden="true">⚔️</span>
+        <p class="letter-date">ZAGREB · MMXXVI · A PERSONAL INVITATION</p>
+      </header>
+
+      <div class="divider" aria-hidden="true">— ✦ —</div>
+
+      <h1 class="salutation">Hey Dennis,</h1>
+
+      <!-- Body paragraphs.
+           We keep text in data-text so JS typewriter can "write" it later. -->
+      <section class="body" aria-label="Message">
+        <p class="para" data-text="I was just thinking about what you said at the con — about hoping we'd see each other again someday. It really stuck with me. :)"></p>
+
+        <p class="para" data-text="I'll be honest — I'm a bit shy putting this out there, but I care about you and our connection, so I wanted to take the initiative. 😳👉👈"></p>
+
+        <p class="para" data-text="If you ever felt like making a trip to Zagreb, you'd be more than welcome. I'm looking at that Sabaton open-air show in June, and it'd be awesome to have you there. We could just hang out, explore, catch the music — no rush, no high-energy plans."></p>
+
+        <aside class="concert-box" id="concertBox" aria-label="Event highlight">
+          <div class="event-name">⚔ SABATON — Open Air Zagreb</div>
+          <div class="event-detail">☩ JUNE 2026 · ZAGREB, CROATIA ☩</div>
+        </aside>
+
+        <p class="para" data-text="If you'd like, you could stay at my place. We made such a good roommate team last time, and I've got space where you can be comfortable and have your own downtime. If you'd prefer your own space though, no worries at all — we can figure that out."></p>
+
+        <p class="para" data-text="Just putting the idea out there for whenever feels right for you. Hope you're having a good week! ♡"></p>
+      </section>
+
+      <footer class="sign-off" id="signOff" aria-label="Signature">
+        <p>Warmly,</p>
+        <p class="signature">— Lovro</p>
+      </footer>
+
+      <!-- Music area (UI + embed container) -->
+      <section class="music-player" id="musicPlayer" aria-label="Music">
+        <button class="play-btn" id="playBtn" type="button" aria-label="Toggle music">
+          <svg id="playIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <polygon points="5,3 19,12 5,21"></polygon>
+          </svg>
+        </button>
+
+        <div class="music-info">
+          <div class="music-title">SABATON — March to War (or Carolus Rex)</div>
+          <div class="music-sub">Optional soundtrack while you read ⚔</div>
+        </div>
+
+        <div class="bars" id="bars" aria-hidden="true">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+
+        <!-- Embed container (hidden by default; JS will show it) -->
+        <div class="embed-wrap" id="ytWrap">
+          <!-- Replace VIDEO_ID later -->
+          <iframe
+            title="YouTube player"
+            width="100%"
+            height="90"
+            src="https://www.youtube.com/embed/Ch4fHabMJcc?autoplay=1&mute=1&rel=0"
+            frameborder="0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+            loading="lazy"></iframe>
+
+          <p class="embed-hint">
+            If it doesn’t start automatically, just press play in the mini player.
+          </p>
+        </div>
+      </section>
+
+      <!-- Optional local audio element (portfolio version can remove) -->
+      <audio id="bgMusic" preload="none"></audio>
+    </article>
+  </main>
+
+</body>
+</html>
