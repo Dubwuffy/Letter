@@ -30,8 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let sealCracked = false;
   let skipTyping = false;
   let playingVisual = false;
+  let isOpening = false;
 
-  /* ====== PARTICLES (FIX 3: guard) ====== */
+  /* ====== SAFE SCROLL UNLOCK ====== */
+  function unlockScroll() {
+    document.documentElement.style.overflowY = "auto";
+    document.body.style.overflowY = "auto";
+    document.body.style.overflowX = "hidden";
+  }
+
+  /* ====== PARTICLES ====== */
   if (canvas) {
     const ctx = canvas.getContext("2d");
 
@@ -39,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
+
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
@@ -52,14 +61,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }));
 
     let particlesRunning = true;
+
     document.addEventListener("visibilitychange", () => {
       particlesRunning = !document.hidden;
     });
 
     function animateParticles() {
-      if (!particlesRunning) return requestAnimationFrame(animateParticles);
+      if (!particlesRunning) {
+        requestAnimationFrame(animateParticles);
+        return;
+      }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       for (const p of particles) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -79,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       requestAnimationFrame(animateParticles);
     }
+
     animateParticles();
   } else {
     console.warn("Canvas #particles not found — skipping particles.");
@@ -86,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ====== SEAL FLOW ====== */
   function crackSeal() {
-    if (sealCracked) return;
+    if (sealCracked || isOpening) return;
     sealCracked = true;
 
     if (sealHint) sealHint.classList.add("hidden");
@@ -97,7 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
       waxSeal.style.animation = "none";
       waxSeal.style.transform = "scale(1.08)";
       waxSeal.style.cursor = "default";
-      setTimeout(() => (waxSeal.style.transform = "scale(1)"), 150);
+      setTimeout(() => {
+        waxSeal.style.transform = "scale(1)";
+      }, 150);
     }
   }
 
@@ -113,11 +130,16 @@ document.addEventListener("DOMContentLoaded", () => {
     console.warn("#waxSeal not found — seal click disabled.");
   }
 
-  /* ====== TYPEWRITER (FAST) ====== */
+  /* ====== TYPEWRITER ====== */
   async function typeInto(el, text, baseSpeed = 9) {
     el.textContent = "";
+
     for (let i = 0; i < text.length; i++) {
-      if (skipTyping) return;
+      if (skipTyping) {
+        el.textContent = text;
+        return;
+      }
+
       const ch = text[i];
       el.textContent += ch;
 
@@ -133,31 +155,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showAllInstant() {
     skipTyping = true;
+
     for (const p of paragraphs) {
       p.textContent = p.getAttribute("data-text") || "";
     }
+
+    if (signOff) signOff.classList.add("revealed");
+    if (musicPlayer) musicPlayer.classList.add("revealed");
   }
 
   async function typeAllParagraphs() {
     skipTyping = false;
+
     for (const p of paragraphs) {
       const text = p.getAttribute("data-text") || "";
       await typeInto(p, text, 9);
-      await wait(140);
+
       if (skipTyping) break;
+      await wait(140);
     }
   }
 
   function armSkipOnce() {
     if (!letter) return;
+
     letter.addEventListener(
       "click",
       () => {
         if (!skipTyping) {
           showAllInstant();
-          // ensure visibility
-          if (signOff) signOff.classList.add("revealed");
-          if (musicPlayer) musicPlayer.classList.add("revealed");
         }
       },
       { once: true }
@@ -167,8 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ====== YOUTUBE TOGGLE + VISUAL PLAY STATE ====== */
   function showYouTube(show) {
     if (!ytWrap) return;
-    ytWrap.style.display = show ? "block" : "none";
-    ytWrap.style.opacity = show ? "1" : "0";
+    ytWrap.classList.toggle("show", show);
   }
 
   function setPlayingVisual(on) {
@@ -203,9 +228,11 @@ document.addEventListener("DOMContentLoaded", () => {
     el.className = "note";
     el.textContent = Math.random() > 0.5 ? "⚔" : "♪";
     el.style.left = rect.left + Math.random() * rect.width + "px";
-    el.style.top = rect.top + rect.height * (0.55 + Math.random() * 0.25) + "px";
+    el.style.top = rect.top + window.scrollY + rect.height * (0.55 + Math.random() * 0.25) + "px";
     el.style.color = Math.random() > 0.5 ? "#c9a84c" : "#8b1a1a";
     el.style.zIndex = "200";
+    el.style.position = "absolute";
+
     document.body.appendChild(el);
 
     setTimeout(() => el.remove(), 2500);
@@ -214,29 +241,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ====== OPEN LETTER ====== */
   async function openLetter(withMusic = false) {
-    if (sealScreen) sealScreen.classList.add("gone");
+    if (isOpening) return;
+    isOpening = true;
 
-    setTimeout(async () => {
-      if (letter) letter.classList.add("visible");
+    unlockScroll();
 
-      armSkipOnce();
+    if (sealScreen) {
+      sealScreen.classList.add("gone");
+    }
 
-      if (concertBox) concertBox.classList.add("revealed");
+    await wait(600);
 
-      await typeAllParagraphs();
+    if (letter) letter.classList.add("visible");
+    if (concertBox) concertBox.classList.add("revealed");
 
-      if (signOff) signOff.classList.add("revealed");
-      if (musicPlayer) musicPlayer.classList.add("revealed");
+    armSkipOnce();
 
-      if (withMusic) {
-        showYouTube(true);
-        setPlayingVisual(true);
-      }
-    }, 600);
+    await typeAllParagraphs();
+
+    if (signOff) signOff.classList.add("revealed");
+    if (musicPlayer) musicPlayer.classList.add("revealed");
+
+    if (withMusic) {
+      showYouTube(true);
+      setPlayingVisual(true);
+    }
+
+    unlockScroll();
   }
 
-  if (openBtn) openBtn.addEventListener("click", () => openLetter(false));
-  if (openMusicBtn) openMusicBtn.addEventListener("click", () => openLetter(true));
+  if (openBtn) {
+    openBtn.addEventListener("click", () => openLetter(false));
+  }
+
+  if (openMusicBtn) {
+    openMusicBtn.addEventListener("click", () => openLetter(true));
+  }
 
   console.log("script.js loaded ✅");
 });
