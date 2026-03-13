@@ -420,11 +420,18 @@ body{
 
 /* Embed wrap (hidden by default; JS will show later) */
 .embed-wrap{
+  display: none;
   grid-column: 1 / -1;
   margin-top: .9rem;
   border-radius: 4px;
   overflow: hidden;
 }
+
+/* shown when music is playing */
+.embed-wrap.show{
+  display: block;
+}
+
 .embed-hint{
   margin-top: .6rem;
   font-family: "Cinzel", serif;
