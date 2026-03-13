@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+
   /* ====== DOM HELPERS ====== */
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -25,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const playIcon = $("#playIcon");
   const bars = $("#bars");
   const ytWrap = $("#ytWrap");
+
+  /* ====== SOUND ====== */
+  const paperSound = new Audio("paper.mp3");
+  paperSound.volume = 0.35;
 
   /* ====== STATE ====== */
   let sealCracked = false;
@@ -67,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function animateParticles() {
+
       if (!particlesRunning) {
         requestAnimationFrame(animateParticles);
         return;
@@ -75,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (const p of particles) {
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(201,168,76,${p.opacity})`;
@@ -87,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
           p.y = canvas.height + 8;
           p.x = Math.random() * canvas.width;
         }
+
         if (p.x < -8) p.x = canvas.width + 8;
         if (p.x > canvas.width + 8) p.x = -8;
       }
@@ -95,46 +103,50 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     animateParticles();
-  } else {
-    console.warn("Canvas #particles not found — skipping particles.");
   }
 
   /* ====== SEAL FLOW ====== */
+
   function crackSeal() {
+
     if (sealCracked || isOpening) return;
     sealCracked = true;
 
-    if (sealHint) sealHint.classList.add("hidden");
-    if (sealLabel) sealLabel.classList.add("hidden");
-    if (sealMenu) sealMenu.classList.add("visible");
+    sealHint?.classList.add("hidden");
+    sealLabel?.classList.add("hidden");
+    sealMenu?.classList.add("visible");
 
     if (waxSeal) {
+
       waxSeal.style.animation = "none";
       waxSeal.style.transform = "scale(1.08)";
       waxSeal.style.cursor = "default";
+
       setTimeout(() => {
         waxSeal.style.transform = "scale(1)";
       }, 150);
     }
   }
 
-  if (waxSeal) {
-    waxSeal.addEventListener("click", crackSeal);
-    waxSeal.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        crackSeal();
-      }
-    });
-  } else {
-    console.warn("#waxSeal not found — seal click disabled.");
-  }
+  waxSeal?.addEventListener("click", crackSeal);
+
+  waxSeal?.addEventListener("keydown", (e) => {
+
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      crackSeal();
+    }
+
+  });
 
   /* ====== TYPEWRITER ====== */
+
   async function typeInto(el, text, baseSpeed = 9) {
+
     el.textContent = "";
 
     for (let i = 0; i < text.length; i++) {
+
       if (skipTyping) {
         el.textContent = text;
         return;
@@ -144,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
       el.textContent += ch;
 
       let delay = baseSpeed;
+
       if (ch === " ") delay = 0;
       if (".!?".includes(ch)) delay += 90;
       if (",;:".includes(ch)) delay += 45;
@@ -154,55 +167,59 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showAllInstant() {
+
     skipTyping = true;
 
     for (const p of paragraphs) {
       p.textContent = p.getAttribute("data-text") || "";
     }
 
-    if (signOff) signOff.classList.add("revealed");
-    if (musicPlayer) musicPlayer.classList.add("revealed");
+    signOff?.classList.add("revealed");
+    musicPlayer?.classList.add("revealed");
   }
 
   async function typeAllParagraphs() {
+
     skipTyping = false;
 
     for (const p of paragraphs) {
+
       const text = p.getAttribute("data-text") || "";
+
       await typeInto(p, text, 9);
 
       if (skipTyping) break;
+
       await wait(140);
     }
   }
 
   function armSkipOnce() {
-    if (!letter) return;
 
-    letter.addEventListener(
-      "click",
-      () => {
-        if (!skipTyping) {
-          showAllInstant();
-        }
-      },
-      { once: true }
-    );
+    letter?.addEventListener("click", () => {
+
+      if (!skipTyping) {
+        showAllInstant();
+      }
+
+    }, { once: true });
   }
 
-  /* ====== YOUTUBE TOGGLE + VISUAL PLAY STATE ====== */
+  /* ====== YOUTUBE + VISUAL STATE ====== */
+
   function showYouTube(show) {
-    if (!ytWrap) return;
-    ytWrap.classList.toggle("show", show);
+    ytWrap?.classList.toggle("show", show);
   }
 
   function setPlayingVisual(on) {
+
     playingVisual = on;
 
-    if (playBtn) playBtn.classList.toggle("playing", on);
-    if (bars) bars.classList.toggle("playing", on);
+    playBtn?.classList.toggle("playing", on);
+    bars?.classList.toggle("playing", on);
 
     if (playIcon) {
+
       playIcon.innerHTML = on
         ? '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'
         : '<polygon points="5,3 19,12 5,21"></polygon>';
@@ -211,56 +228,69 @@ document.addEventListener("DOMContentLoaded", () => {
     if (on) spawnNote();
   }
 
-  if (playBtn) {
-    playBtn.addEventListener("click", () => {
-      const willPlay = !playingVisual;
-      showYouTube(willPlay);
-      setPlayingVisual(willPlay);
-    });
-  }
+  playBtn?.addEventListener("click", () => {
+
+    const willPlay = !playingVisual;
+
+    showYouTube(willPlay);
+    setPlayingVisual(willPlay);
+
+  });
 
   /* ====== FLOATING NOTES ====== */
+
   function spawnNote() {
+
     if (!playingVisual || !letter) return;
 
     const rect = letter.getBoundingClientRect();
+
     const el = document.createElement("div");
+
     el.className = "note";
     el.textContent = Math.random() > 0.5 ? "⚔" : "♪";
+
     el.style.left = rect.left + Math.random() * rect.width + "px";
     el.style.top = rect.top + window.scrollY + rect.height * (0.55 + Math.random() * 0.25) + "px";
+
     el.style.color = Math.random() > 0.5 ? "#c9a84c" : "#8b1a1a";
-    el.style.zIndex = "200";
     el.style.position = "absolute";
+    el.style.zIndex = "200";
 
     document.body.appendChild(el);
 
     setTimeout(() => el.remove(), 2500);
+
     setTimeout(spawnNote, 750 + Math.random() * 450);
   }
 
   /* ====== OPEN LETTER ====== */
+
   async function openLetter(withMusic = false) {
+
     if (isOpening) return;
     isOpening = true;
 
     unlockScroll();
 
-    if (sealScreen) {
-      sealScreen.classList.add("gone");
-    }
+    sealScreen?.classList.add("gone");
 
     await wait(600);
 
-    if (letter) letter.classList.add("visible");
-    if (concertBox) concertBox.classList.add("revealed");
+    letter?.classList.add("visible");
+
+    /* 🔊 PAPER SOUND */
+    paperSound.currentTime = 0;
+    paperSound.play().catch(() => {});
+
+    concertBox?.classList.add("revealed");
 
     armSkipOnce();
 
     await typeAllParagraphs();
 
-    if (signOff) signOff.classList.add("revealed");
-    if (musicPlayer) musicPlayer.classList.add("revealed");
+    signOff?.classList.add("revealed");
+    musicPlayer?.classList.add("revealed");
 
     if (withMusic) {
       showYouTube(true);
@@ -270,13 +300,9 @@ document.addEventListener("DOMContentLoaded", () => {
     unlockScroll();
   }
 
-  if (openBtn) {
-    openBtn.addEventListener("click", () => openLetter(false));
-  }
-
-  if (openMusicBtn) {
-    openMusicBtn.addEventListener("click", () => openLetter(true));
-  }
+  openBtn?.addEventListener("click", () => openLetter(false));
+  openMusicBtn?.addEventListener("click", () => openLetter(true));
 
   console.log("script.js loaded ✅");
+
 });
